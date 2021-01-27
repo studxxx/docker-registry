@@ -1,0 +1,10 @@
+---
+- name: Set Up
+  hosts: all
+  remote_user: root
+#  remote_user: studxxx
+#  become: yes
+  roles:
+    - docker
+    - certbot
+    - registry
