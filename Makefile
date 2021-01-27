@@ -1,9 +1,13 @@
 init: docker-down-clear docker-pull docker-build docker-up
 up: docker-up
 down: docker-down
+state: docker-state
 
 docker-up:
 	docker-compose up -d
+
+docker-state:
+	docker-compose ps
 
 docker-down:
 	docker-compose down --remove-orphans
@@ -19,3 +23,12 @@ docker-build:
 
 password:
 	docker run --rm  --entrypoint htpasswd registry:2.7.0 -Bbn registry password > htpasswd
+
+deploy:
+	ssh ${HOST} -p ${PORT} 'rm -rf registry && mkdir registry'
+	scp -P ${PORT} docker-compose-prod.yml ${HOST}:registry/docker-compose.yml
+	scp -P ${PORT} -r docker ${HOST}:registry/docker
+	scp -P ${PORT} ${HTPASSWD_FILE} ${HOST}:registry/htpasswd
+	ssh ${HOST} -p ${PORT} 'cd registry && echo "COMPOSE_PROJECT_NAME=registry" >> .env'
+	ssh ${HOST} -p ${PORT} 'cd registry && docker-compose pull'
+	ssh ${HOST} -p ${PORT} 'cd registry && docker-compose up --build --remove-orphans -d'
