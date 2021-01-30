@@ -1,0 +1,3 @@
+certbot_email: stud181177@gmail.com
+certbot_hosts:
+  - registry.studxxx-developer.site
